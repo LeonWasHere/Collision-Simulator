@@ -44,6 +44,31 @@ public class SceneBuffer {
         return textureId;
     }
 
+    public void resize(Window window) {
+        // Deletes old texture
+        glDeleteTextures(textureId);
+
+        // Regenerates texture
+        int[] textureIds = new int[1];
+        glGenTextures(textureIds);
+        textureId = textureIds[0];
+
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, bufferId);
+
+        glBindTexture(GL_TEXTURE_2D, textureId);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, window.getWidth(), window.getHeight(), 0, GL_RGB, GL_FLOAT, (ByteBuffer) null);
+
+        // For sampling
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+        // Attaches the texture to the buffer
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textureId, 0);
+
+        // Unbinds
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    }
+
     public void cleanup() {
         glDeleteFramebuffers(bufferId);
 
