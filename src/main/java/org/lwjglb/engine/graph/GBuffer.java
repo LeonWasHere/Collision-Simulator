@@ -96,6 +96,57 @@ public class GBuffer {
         return textureIds[TOTAL_TEXTURES-1];
     }
 
+    public void resize(Window window) {
+        this.width = window.getWidth();
+        this.height = window.getHeight();
+
+        // Deletes old textures
+        glDeleteTextures(textureIds);
+
+        // Regenerates textures
+        glGenTextures(textureIds);
+
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, gBufferId);
+
+        // Recreates textures
+        for(int i=0; i<TOTAL_TEXTURES; i++) {
+            glBindTexture(GL_TEXTURE_2D, textureIds[i]);
+            int attachmentType;
+            switch(i) {
+                case TOTAL_TEXTURES - 1:
+                    // Depth component
+                    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32F, width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT,
+                            (ByteBuffer) null);
+                    attachmentType = GL_DEPTH_ATTACHMENT;
+                    break;
+                default:
+                    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, width, height, 0, GL_RGB, GL_FLOAT, (ByteBuffer) null);
+                    attachmentType = GL_COLOR_ATTACHMENT0 + i;
+                    break;
+            }
+            // For sampling
+            glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+            glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+            // Attaches the texture to the G-Buffer
+            glFramebufferTexture2D(GL_FRAMEBUFFER, attachmentType, GL_TEXTURE_2D, textureIds[i], 0);
+        }
+
+        // Sets draw buffers again
+        try (MemoryStack stack = MemoryStack.stackPush()) {
+            IntBuffer intBuff = stack.mallocInt(TOTAL_TEXTURES);
+            int values[] = {GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3, GL_COLOR_ATTACHMENT4, GL_COLOR_ATTACHMENT5};
+            for(int i = 0; i < values.length; i++) {
+                intBuff.put(values[i]);
+            }
+            intBuff.flip();
+            glDrawBuffers(intBuff);
+        }
+
+        // Unbinds
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    }
+
     public void cleanUp() {
         glDeleteFramebuffers(gBufferId);
 

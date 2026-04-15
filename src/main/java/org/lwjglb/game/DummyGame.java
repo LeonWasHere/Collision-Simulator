@@ -4,6 +4,8 @@ import org.joml.*;
 
 import static org.lwjgl.glfw.GLFW.*;
 
+import static org.lwjgl.opengl.GL11.*;
+
 import org.lwjglb.engine.IGameLogic;
 import org.lwjglb.engine.MouseInput;
 import org.lwjglb.engine.Scene;
@@ -350,6 +352,12 @@ public class DummyGame implements IGameLogic {
         if (firstTime) {
             sceneChanged = true;
             firstTime = false;
+        }
+        if (window.isResized()) {
+            glViewport(0, 0, window.getWidth(), window.getHeight());
+            window.updateProjectionMatrix();
+            renderer.resize(window);
+            window.setResized(false);
         }
         renderer.render(window, camera, scene, sceneChanged);
     }

@@ -85,6 +85,11 @@ public class Renderer {
         bufferPassMesh = StaticMeshesLoader.load("src/main/resources/models/buffer_pass_mess.obj", "src/main/resources/models")[0];
     }
 
+    public void resize(Window window) {
+        gBuffer.resize(window);
+        sceneBuffer.resize(window);
+    }
+
     public void render(Window window, Camera camera, Scene scene, boolean sceneChanged) {
         clear();
 
