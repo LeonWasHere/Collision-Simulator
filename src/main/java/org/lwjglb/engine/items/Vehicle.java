@@ -9,9 +9,13 @@ package org.lwjglb.engine.items;
  * movable entities in the scene such as Cars and Planes.
  */
 
+import org.joml.Vector3f;
 import org.lwjglb.engine.graph.Mesh;
 
 public class Vehicle extends GameItem {
+
+    protected float speed = 0.01f;        // Stores current forward movement speed
+    protected float acceleration = 0.0f;  // Stores rate at which speed increases or decreases
 
     /**
      * Default constructor for Vehicle.
@@ -40,5 +44,58 @@ public class Vehicle extends GameItem {
      */
     public Vehicle(Mesh[] meshes) {
         super(meshes);
+    }
+
+    /**
+     * Gets the current movement speed of the vehicle.
+     * @return
+     */
+    public float getSpeed() {
+        return speed;
+    }
+
+    /**
+     * Sets the movement speed of the vehicle.
+     * @param speed
+     */
+    public void setSpeed(float speed) {
+        this.speed = speed;
+    }
+
+    /**
+     * Gets the current acceleration value of the vehicle.
+     * @return
+     */
+    public float getAcceleration() {
+        return acceleration;
+    }
+
+    /**
+     * Sets the acceleration value of the vehicle.
+     * @param acceleration
+     */
+    public void setAcceleration(float acceleration) {
+        this.acceleration = acceleration;
+    }
+
+    /**
+     * Updates the movement state of the vehicle.
+     * @param interval
+     */
+    public void update(float interval) {
+        // Applies acceleration to speed
+        speed += acceleration * interval;
+
+        // Applies restrictions for possible speed
+        if (speed < 0.0f) {
+            speed = 0.0f;
+        }
+        if (speed > 0.5f) {
+            speed = 0.5f;
+        }
+
+        // Applies basic movement
+        Vector3f pos = getPosition();
+        pos.z += speed;
     }
 }
