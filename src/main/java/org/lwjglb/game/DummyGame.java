@@ -1,5 +1,15 @@
 package org.lwjglb.game;
 
+/**
+ * Author: Leon Wasiliew
+ * Subject: INFT4000 - Special Topics 1
+ * Creation Date: 2026-04-15
+ * Modification Date: 2026-04-15
+ * Description: DummyGame provides a sample implementation of IGameLogic (interface),
+ * demonstrating scene setup, rendering, lighting, camera control, object spawning,
+ * and basic collision testing.
+ */
+
 import org.joml.*;
 
 import static org.lwjgl.glfw.GLFW.*;
@@ -45,199 +55,199 @@ import java.util.List;
 public class DummyGame implements IGameLogic {
 
     private static final float MOUSE_SENSITIVITY = 0.2f;
-
-    private final Vector3f cameraInc;
-
-    private final Renderer renderer;
-
-    private final Camera camera;
-
-    private Scene scene;
-
     private static final float CAMERA_POS_STEP = 0.40f;
 
+    private final Vector3f cameraInc;
+    private final Renderer renderer;
+    private final Camera camera;
+    private Scene scene;
+
     private float angleInc;
-
     private float lightAngle;
-
-    private boolean firstTime;
-
+    private boolean firstTime = true;
     private boolean sceneChanged;
 
     private Vector3f pointLightPos;
 
-    private GameItem t;
+    private boolean removeAll = false;
 
-    private boolean isCollisionTestActive = false;   // Tracks whether the Collision Test is active
 
+    private boolean testModeActive = false;   // Tracks whether the Collision Test is active
     private boolean isTKeyPressedLastFrame = false;  // Tracks whether the "T" key is pressed last
 
+    private java.util.Random random = new java.util.Random();  // Generates random numbers
+
+    /**
+     * Default constructor for DummyGame.
+     * Initializes the renderer, camera, movement vector,
+     * and default lighting rotation values.
+     */
     public DummyGame() {
         renderer = new Renderer();
         camera = new Camera();
         cameraInc = new Vector3f(0.0f, 0.0f, 0.0f);
         angleInc = 0;
         lightAngle = 90;
-        firstTime = true;
     }
 
+    /**
+     * Initializes the engine state and prepares all scene components.
+     * Loads terrain, fog, skybox, lighting, and sets the initial camera
+     * position and orientation for the starting window.
+     * @param window
+     * @throws Exception
+     */
     @Override
     public void init(Window window) throws Exception {
-        renderer.init(window);
 
-        scene = new Scene();
+        renderer.init(window);  // Initializes renderer resources and shaders
 
-        /// Make a mesh using blender (or whatever utility),
-        /// save as an OBJ file with cube projection including Normals,
-        /// UVs, Materials, and Triangulate Faces.  The Mesh can then be
-        /// loaded into this game, with position, velocity, rotation, rotation velocity and scale
-        /// Also note that the same mesh can be loaded more than obce with different parameters, say
-        /// a different scale.
-        /// The mesh alone can't move...so we make it a GameItem, which can move/rotate/scale
-        /// Then we add all the GameItems to the "scene"
-        Mesh[] houseMesh = StaticMeshesLoader.load("src/main/resources/models/house/house.obj", "src/main/resources/models/house");
-        GameItem house = new GameItem(houseMesh);
-        house.setVelocity(0.002f, 0.001f, 0.003f);
-        house.setRotationVel(new Quaternionf(0.06f, 0.01f, 0.03f, 0.0f));
-        house.setScale(0.150f);
-        t = house;
+        scene = new Scene();  // Creates a new scene container
 
-        Mesh[] cubeMesh = StaticMeshesLoader.load("src/main/resources/models/cube.obj", "src/main/resources/models");
-        GameItem cube = new GameItem(cubeMesh);
-        cube.setPosition(11.00f, 11.000f, 11.000f);
-        cube.setVelocity(0.002f, 0.001f, 0.003f);
-        cube.setRotation(new Quaternionf(2.6f, 4.7f, 3.9f, 0.0f));
-        cube.setRotationVel(new Quaternionf(0.006f, 0.007f, 0.0009f, 0.0f));
-
-
-        Mesh[] russMesh = StaticMeshesLoader.load("src/main/resources/models/russ/Chevrolet_Camaro_SS_Low.obj", "src/main/resources/models/russ");
-        GameItem russ_shape_01 = new GameItem(russMesh);
-        russ_shape_01.setPosition(5.00f, 1.000f, 5.000f);
-        russ_shape_01.setVelocity(0.014f, 0.002f, 0.03f);
-        russ_shape_01.setRotationVel(new Quaternionf(0.004f, 0.015f, 0.05f, 0.0f));
-        russ_shape_01.setScale(0.50f);
-
-        Mesh[] russMesh2 = StaticMeshesLoader.load("src/main/resources/models/russ/toyPlane.obj", "src/main/resources/models/russ");
-        GameItem russ_shape_02 = new GameItem(russMesh2);
-        russ_shape_02.setPosition(1.00f, 1.000f, 1.000f);
-        russ_shape_02.setVelocity(0.002f, 0.06f, 0.03f);
-        russ_shape_02.setScale(0.50f);
-
-        Mesh[] torusMesh = StaticMeshesLoader.load("src/main/resources/models/russ/MIsil.obj", "src/main/resources/models/russ");
-        //Mesh[] torusMesh = StaticMeshesLoader.load("src/main/resources/models/russ/Motorcycle.obj", "src/main/resources/models/russ");
-        //Mesh[] torusMesh = StaticMeshesLoader.load("src/main/resources/models/russ/torus.obj", "src/main/resources/models/russ");
-        GameItem russ_shape_03 = new GameItem(torusMesh);
-        russ_shape_03.setPosition(2.00f, 10.000f, -5.000f);
-        russ_shape_03.setVelocity(0.014f, -0.002f, -0.03f);
-        russ_shape_03.setRotationVel(new Quaternionf(0.004f, 0.015f, 0.05f, 0.0f));
-        russ_shape_03.setScale(0.50f);
-
-        Mesh[] terrainMesh = StaticMeshesLoader.load("src/main/resources/models/terrain/terrain.obj", "src/main/resources/models/terrain");
-        GameItem terrain = new GameItem(terrainMesh);
-        terrain.setPosition(0.00f, -15.000f, 0.000f);
-        terrain.setScale(100.0f);
-
-        scene.setGameItems(new GameItem[]{house, cube, russ_shape_01, russ_shape_02, russ_shape_03, terrain});
-
-        // Shadows
-        scene.setRenderShadows(true);
-
-        // Fog
-        Vector3f fogColour = new Vector3f(0.5f, 0.5f, 0.5f);
-        scene.setFog(new Fog(true, fogColour, 0.02f));
-
-        // Setup  SkyBox
-        float skyBoxScale = 100.0f;
-        SkyBox skyBox = new SkyBox("src/main/resources/models/skybox.obj", new Vector4f(0.65f, 0.65f, 0.65f, 1.0f));
-        skyBox.setScale(skyBoxScale);
-        scene.setSkyBox(skyBox);
-
-        // Setup Lights
-        setupLights();
-
-        // Set camera position and rotation to look back at our scene
-        camera.setPosition(-17.0f, 17.0f, -30.0f);
-        camera.setRotation(20.0f, 140.0f, 0.0f);
-
+        loadDefaultScene();  // Loads the default scene
     }
 
+    /**
+     * Initializes all lighting used in the scene.
+     * Configures ambient, skybox, directional, and point lights.
+     */
     private void setupLights() {
-        SceneLight sceneLight = new SceneLight();
-        scene.setSceneLight(sceneLight);
+        SceneLight sceneLight = new SceneLight();  // Creates a new lighting container
+        scene.setSceneLight(sceneLight);           // Registers the container with the scene
 
-        // Ambient Light
+        // Ambient and skybox lighting
         sceneLight.setAmbientLight(new Vector3f(0.3f, 0.3f, 0.3f));
         sceneLight.setSkyBoxLight(new Vector3f(1.0f, 1.0f, 1.0f));
 
-        // Directional Light
+        // Directional light setup
         float lightIntensity = 1.0f;
         Vector3f lightDirection = new Vector3f(0, 1, 1);
-        DirectionalLight directionalLight = new DirectionalLight(new Vector3f(1, 1, 1), lightDirection, lightIntensity);
+        DirectionalLight directionalLight = new DirectionalLight(new Vector3f(1, 1, 1),
+                lightDirection, lightIntensity);
         sceneLight.setDirectionalLight(directionalLight);
 
+        // Initial point light position
         pointLightPos = new Vector3f(0.0f, 25.0f, 0.0f);
+
+        // Point light setup
         Vector3f pointLightColour = new Vector3f(0.0f, 1.0f, 0.0f);
         PointLight.Attenuation attenuation = new PointLight.Attenuation(1, 0.0f, 0);
         PointLight pointLight = new PointLight(pointLightColour, pointLightPos, lightIntensity, attenuation);
         sceneLight.setPointLightList(new PointLight[]{pointLight});
     }
 
+    /**
+     * Processes user input for the current frame.
+     * Handles scene toggling, camera movement, lighting adjustments,
+     * and prepares movement increments for the update cycle.
+     * @param window
+     * @param mouseInput
+     */
     @Override
     public void input(Window window, MouseInput mouseInput) {
+
+        // Resets scene-change flag and clears camera movement increments
         sceneChanged = false;
         cameraInc.set(0, 0, 0);
-        // Executes the collision test once "T" is pressed
-        if (window.isKeyPressed(GLFW_KEY_T)) {
-            executeCollisionTest();
+
+        // Toggles the collision test once the T key is pressed
+        boolean tPressed = window.isKeyPressed(GLFW_KEY_T);
+        if (tPressed && !isTKeyPressedLastFrame) {
+            testModeActive = !testModeActive;
+
+            if (testModeActive) {
+                executeCollisionTest();  // Executes the collision test if it is newly active
+            } else {
+                loadDefaultScene();  // Resets to the default scene if it is not active
+            }
         }
+        isTKeyPressedLastFrame = tPressed;
+
+        // Defines camera movement controls (WASD + Z/X for vertical movement)
         if (window.isKeyPressed(GLFW_KEY_W)) {
-            sceneChanged = true;
             cameraInc.z = -1;
         } else if (window.isKeyPressed(GLFW_KEY_S)) {
-            sceneChanged = true;
             cameraInc.z = 1;
         }
         if (window.isKeyPressed(GLFW_KEY_A)) {
-            sceneChanged = true;
             cameraInc.x = -1;
         } else if (window.isKeyPressed(GLFW_KEY_D)) {
-            sceneChanged = true;
             cameraInc.x = 1;
         }
         if (window.isKeyPressed(GLFW_KEY_Z)) {
-            sceneChanged = true;
             cameraInc.y = -1;
         } else if (window.isKeyPressed(GLFW_KEY_X)) {
-            sceneChanged = true;
             cameraInc.y = 1;
         }
-        if (window.isKeyPressed(GLFW_KEY_LEFT)) {
-            sceneChanged = true;
+
+        // Directional light rotation (-/=)
+        if (window.isKeyPressed(GLFW_KEY_MINUS)) {
             angleInc -= 0.05f;
-        } else if (window.isKeyPressed(GLFW_KEY_RIGHT)) {
-            sceneChanged = true;
+        } else if (window.isKeyPressed(GLFW_KEY_EQUAL)) {
             angleInc += 0.05f;
         } else {
             angleInc = 0;
         }
-        if (window.isKeyPressed(GLFW_KEY_UP)) {
-            sceneChanged = true;
+
+        // Point Light vertical adjustments
+        if (window.isKeyPressed(GLFW_KEY_1)) {
             pointLightPos.y += 0.5f;
-        } else if (window.isKeyPressed(GLFW_KEY_DOWN)) {
-            sceneChanged = true;
+        } else if (window.isKeyPressed(GLFW_KEY_2)) {
             pointLightPos.y -= 0.5f;
         }
-        if (window.isKeyPressed(GLFW_KEY_SPACE)) {
-            sceneChanged = true;
-            this.addMeshOnScreen();
-        }
-        if (window.isKeyPressed(GLFW_KEY_LEFT_SHIFT)) {
-            sceneChanged = true;
-            this.removeAll = true;
+
+        // TODO: Implement Vehicle control - the last added (GLFW_KEY_UP, GLFW_KEY_DOWN, GLFW_KEY_LEFT, GLFW_KEY_RIGHT)
+
+        // TODO: Implement GUI actions (Add Car, Add Plane, Clear Screen)
+    }
+
+    /**
+     * Spawns a car at a random position within the scene.
+     */
+    private void spawnCar() {
+        try {
+            // Loads the car mesh
+            Mesh[] mesh = StaticMeshesLoader.load("src/main/resources/models/russ/Chevrolet_Camaro_SS_Low.obj",
+                    "src/main/resources/models/russ");
+
+            Car car = new Car(mesh);  // Creates a new car instance
+
+            // Assigns a random position within a 20 x 20 area on the ground
+            car.setPosition(-10 + random.nextFloat() * 20, 0.0f, -10 + random.nextFloat() * 20);
+
+            // Applies a slow default velocity
+            car.setVelocity(0.01f, 0.0f, 0.01f);
+
+            scene.addGameItem(car);  // Adds the car to the scene
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
-    java.util.Random r = new java.util.Random();
+    /**
+     * Spawns a plane at a random position within the scene.
+     */
+    private void spawnPlane() {
+        try {
+            // Loads the plane mesh
+            Mesh[] mesh = StaticMeshesLoader.load("src/main/resources/models/russ/toyPlane.obj",
+                    "src/main/resources/models/russ");
+
+            Plane plane = new Plane(mesh);  // Creates a new plane instance
+
+            // Assigns a random position within a 20 x 20 area with altitude between 5 and 15
+            plane.setPosition(-10 + random.nextFloat() * 20, 5 + random.nextFloat() * 10, -10 + random.nextFloat() * 20);
+
+            // Applies a slow default velocity
+            plane.setVelocity(0.01f, 0.005f, 0.01f);
+
+            scene.addGameItem(plane);  // Adds the plane to the scene
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     /**
      * Executes a predefined collision test scenario.
@@ -263,29 +273,34 @@ public class DummyGame implements IGameLogic {
             terrain.setPosition(0.0f, 0.0f, 0.0f);
             terrain.setScale(100.0f);
 
-            // Stages Car Test
+            // Creates two car objects
             Car car1 = new Car(carMesh);
-            car1.setPosition(-5.0f, 0.0f, 0.0f);
-            car1.setVelocity(0.02f, 0.0f, 0.0f);
-
             Car car2 = new Car(carMesh);
+
+            // Sets the position of the two cars
+            car1.setPosition(-5.0f, 0.0f, 0.0f);
             car2.setPosition(5.0f, 0.0f, 0.0f);
+
+            // Sets the speed of the two cars
+            car1.setVelocity(0.02f, 0.0f, 0.0f);
             car2.setVelocity(-0.02f, 0.0f, 0.0f);
 
-            // Stages Plane Test
+            // Creates two plane objects
             Plane plane1 = new Plane(planeMesh);
-            plane1.setPosition(-5.0f, 5.0f, 0.0f);
-            plane1.setVelocity(0.02f, 0.0f, 0.0f);
-
             Plane plane2 = new Plane(planeMesh);
+
+            // Sets the position of the two planes
+            plane1.setPosition(-5.0f, 5.0f, 0.0f);
             plane2.setPosition(5.0f, 5.0f, 0.0f);
+
+            // Sets the speed of the two planes
+            plane1.setVelocity(0.02f, 0.0f, 0.0f);
             plane2.setVelocity(-0.0f, 0.0f, 0.0f);
 
             // Adds to scene
-            scene.addGameItem(car1);
-            scene.addGameItem(car2);
-            scene.addGameItem(plane1);
-            scene.addGameItem(plane2);
+            scene.setGameItems(new GameItem[]{
+                    car1, car2, plane1, plane2
+            });
 
             // Prints info to the console
             System.out.println("Collision test started (T key)");
@@ -295,6 +310,50 @@ public class DummyGame implements IGameLogic {
         }
     }
 
+    private void loadDefaultScene() {
+        try {
+            scene.removeAll();
+
+            // Setup Terrain
+            Mesh[] terrainMesh = StaticMeshesLoader.load("src/main/resources/models/terrain/terrain.obj",
+                    "src/main/resources/models/terrain");
+
+            GameItem terrain = new GameItem(terrainMesh);
+            terrain.setPosition(0.00f, -15.000f, 0.000f);
+            terrain.setScale(100.0f);
+
+            scene.setGameItems(new GameItem[]{terrain});
+
+            // Setup Fog
+            Vector3f fogColour = new Vector3f(0.5f, 0.5f, 0.5f);
+            scene.setFog(new Fog(true, fogColour, 0.02f));
+
+            // Setup SkyBox
+            float skyBoxScale = 100.0f;
+            SkyBox skyBox = new SkyBox("src/main/resources/models/skybox.obj", new Vector4f(0.65f, 0.65f, 0.65f, 1.0f));
+            skyBox.setScale(skyBoxScale);
+            scene.setSkyBox(skyBox);
+
+            // Setup Lights
+            setupLights();
+
+            // Setup camera position and rotation to look back at the scene
+            camera.setPosition(-17.0f, 17.0f, -30.0f);
+            camera.setRotation(20.0f, 140.0f, 0.0f);
+
+            System.out.println("Scene reset");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Updates the game state for the current frame.
+     * @param interval
+     * @param mouseInput
+     * @param window
+     */
     @Override
     public void update(float interval, MouseInput mouseInput, Window window) {
 
@@ -302,140 +361,94 @@ public class DummyGame implements IGameLogic {
         // thread, all the time, so cause the lighting/shadows to be recomputed
         sceneChanged = true;
 
-        // Clear screen?
-        if (GameGUI.getClearCommand()) {
-            removeAll = true;
-        }
-
-        // If reset, set this gameItem back to a location.
-        if (GameGUI.getResetCommand()) {
-            t.setPosition(11.00f, 11.000f, 15 * r.nextFloat());
-            t.setVelocity(0.002f, 0.001f, 0.003f);
-            t.setRotation(new Quaternionf(2.6f, 4.7f, 3.9f, 0.0f));
-            t.setRotationVel(new Quaternionf(0.006f, 0.007f, 0.0009f, 0.0f));
-        }
-
-        // If adding, add a gameItem
-        if (GameGUI.getAddCommand()) {
-            addMeshOnScreen();
-        }
-
-        // Get location of each GameItem
+        // Retrieves all GameItems in the scene
         List<GameItem> gameItems = scene.getgameItems();
 
-        // Filters only Vehicle objects
+        // Filters only Vehicle objects for collision checks
         List<Vehicle> vehicles = new ArrayList<Vehicle>();
 
-        // Determines if the GameItem is a Vehicle object
+        // Determines if each GameItem is a Vehicle
         for (GameItem item : gameItems) {
             if (item instanceof Vehicle) {
                 vehicles.add((Vehicle) item);
             }
         }
 
-        System.out.println();
-        for (GameItem gameItem1 : gameItems) {
-            System.out.println();
-            for (GameItem gameItem2 : gameItems) {
-                if (gameItem1 != gameItem2) {
-                    System.out.print("  GameItem1.x=" + gameItem1.getPosition().x);
-                    System.out.print("     GameItem2.x=" + gameItem2.getPosition().x);
-                }
-            }
-        }
-
-        // Runs collision detection
+        // Runs collision detection on all vehicles
         CollisionManager.manageVehicleCollision(vehicles);
 
+        // Applies camera movement based on the input
+        camera.movePosition(
+                cameraInc.x * CAMERA_POS_STEP,
+                cameraInc.y * CAMERA_POS_STEP,
+                cameraInc.z * CAMERA_POS_STEP);
+
+        // Handles camera rotation when the right mouse button is pressed
         if (mouseInput.isRightButtonPressed()) {
-            // Update camera based on mouse            
             Vector2f rotVec = mouseInput.getDisplVec();
-            camera.moveRotation(rotVec.x * MOUSE_SENSITIVITY, rotVec.y * MOUSE_SENSITIVITY, 0);
-            sceneChanged = true;
+            camera.moveRotation(
+                    rotVec.x * MOUSE_SENSITIVITY,
+                    rotVec.y * MOUSE_SENSITIVITY,
+                    0);
         }
 
-        // Update camera position
-        camera.movePosition(cameraInc.x * CAMERA_POS_STEP, cameraInc.y * CAMERA_POS_STEP, cameraInc.z * CAMERA_POS_STEP);
-
+        // Updates directional light angle
         lightAngle += angleInc;
         if (lightAngle < 0) {
             lightAngle = 0;
         } else if (lightAngle > 180) {
             lightAngle = 180;
         }
+
+        // Computes new light direction from the angle
         float zValue = (float) Math.cos(Math.toRadians(lightAngle));
         float yValue = (float) Math.sin(Math.toRadians(lightAngle));
+
+        // Updates directional light vector
         Vector3f lightDirection = this.scene.getSceneLight().getDirectionalLight().getDirection();
         lightDirection.x = 0;
         lightDirection.y = yValue;
         lightDirection.z = zValue;
         lightDirection.normalize();
 
-        // Update view matrix
+        // Updates view matrix
         camera.updateViewMatrix();
     }
 
-    public void addMeshOnScreen() {
-        try {
-            Mesh[] addMesh = StaticMeshesLoader.load("src/main/resources/models/house/house.obj", "src/main/resources/models/house");
-//            Mesh[] addMesh = StaticMeshesLoader.load("src/main/resources/models/russ/russ9.obj", "src/main/resources/models/russ");
-            GameItem shape = new GameItem(addMesh);
-            shape.setScale(0.10f);  //house needs to be shrunk
-            shape.setPosition(5.00f * r.nextFloat(), 5.000f * r.nextFloat(), 15 * r.nextFloat());
-            shape.setVelocity(0.05f * r.nextFloat(), 0.04f * r.nextFloat(), 0.03f * r.nextFloat());
-            shape.setRotationVel(new Quaternionf(0.06f * r.nextFloat(), 0.08f * r.nextFloat(), 0.09f * r.nextFloat(), 0.0f));
-            scene.addGameItem(shape);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void clearScreen() {
-        try {
-            // Remove everything, then put back the basics
-            scene.removeAll();
-
-            Mesh[] terrainMesh = StaticMeshesLoader.load("src/main/resources/models/terrain/terrain.obj", "src/main/resources/models/terrain");
-            GameItem terrain = new GameItem(terrainMesh);
-            terrain.setPosition(0.00f, -15.000f, 0.000f);
-            terrain.setScale(100.0f);
-
-            scene.setGameItems(new GameItem[]{terrain});
-
-            // Setup  SkyBox
-            float skyBoxScale = 100.0f;
-            SkyBox skyBox = new SkyBox("src/main/resources/models/skybox.obj", new Vector4f(0.65f, 0.65f, 0.65f, 1.0f));
-            skyBox.setScale(skyBoxScale);
-            scene.setSkyBox(skyBox);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-
-    }
-
-    // set flag to indicate to remove all meshes.
-    boolean removeAll = false;
-
+    /**
+     * Renders the current frame to the window.
+     * @param window
+     */
     @Override
     public void render(Window window) {
-        if (this.removeAll) {
-            this.clearScreen();
-            this.removeAll = false;  //toggle
+
+        // Checks if all items should be removed and resets the scene
+        if (removeAll) {
+            loadDefaultScene();  // Resets to default scene state
+            removeAll = false;   // Clears the flag
         }
+
+        // Marks the scene as changed on the first render pass
         if (firstTime) {
             sceneChanged = true;
             firstTime = false;
         }
+
+        // Handles window resizing
         if (window.isResized()) {
             glViewport(0, 0, window.getWidth(), window.getHeight());
             window.updateProjectionMatrix();
             renderer.resize(window);
             window.setResized(false);
         }
+
+        // Performs the actual rendering of the screen
         renderer.render(window, camera, scene, sceneChanged);
     }
 
+    /**
+     * Releases resources by cleaning up the renderer and scene.
+     */
     @Override
     public void cleanup() {
         renderer.cleanup();
