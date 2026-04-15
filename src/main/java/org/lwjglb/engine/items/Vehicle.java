@@ -95,7 +95,6 @@ public class Vehicle extends GameItem {
         }
 
         // Applies basic movement
-        Vector3f pos = getPosition();
-        pos.z += speed;
+        getVelocity().z = speed;
     }
 }

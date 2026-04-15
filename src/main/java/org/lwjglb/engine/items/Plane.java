@@ -1,5 +1,6 @@
 package org.lwjglb.engine.items;
 
+import org.joml.Vector3f;
 import org.lwjglb.engine.graph.Mesh;
 
 /**
@@ -12,6 +13,8 @@ import org.lwjglb.engine.graph.Mesh;
  */
 
 public class Plane extends Vehicle {
+
+    private float bound = 15.0f;  // Defines movement boundary
 
     /**
      * Default constructor for Plane.
@@ -40,6 +43,43 @@ public class Plane extends Vehicle {
      */
     public Plane(Mesh[] meshes) {
         super(meshes);
+    }
+
+    /**
+     * Updates the movement state of the plane.
+     * Adjusts velocity based on speed and applies full 3D boundary bouncing.
+     * @param interval
+     */
+    @Override
+    public void update(float interval) {
+
+        // Applies acceleration to speed
+        super.update(interval);
+
+        Vector3f pos = getPosition();  // Current position
+        Vector3f vel = getVelocity();  // Current velocity vector
+
+        // Normalizes velocity when not zero (otherwise default forward Z movement)
+        if (vel.length() != 0) {
+            vel.normalize().mul(speed);
+        } else {
+            vel.z = speed;
+        }
+
+        // Defines boundary bouncing (X axis)
+        if (Math.abs(pos.x) > bound) {
+            vel.x = -vel.x;
+        }
+
+        // Defines boundary bouncing (Y axis)
+        if (Math.abs(pos.y) > bound) {
+            vel.y = -vel.y;
+        }
+
+        // Defines boundary bouncing (Z axis)
+        if (Math.abs(pos.z) > bound) {
+            vel.z = -vel.z;
+        }
     }
 
     // TODO: Implement Plane-specific logic
