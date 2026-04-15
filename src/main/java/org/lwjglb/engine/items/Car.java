@@ -1,5 +1,6 @@
 package org.lwjglb.engine.items;
 
+import org.joml.Vector3f;
 import org.lwjglb.engine.graph.Mesh;
 
 /**
@@ -12,6 +13,8 @@ import org.lwjglb.engine.graph.Mesh;
  */
 
 public class Car extends Vehicle {
+
+    private float groundY = 0.0f;  // Defaults to 0 on Y-axis (change to not clip tires through)
 
     /**
      * Default constructor for Car.
@@ -40,6 +43,36 @@ public class Car extends Vehicle {
      */
     public Car(Mesh[] meshes) {
         super(meshes);
+    }
+
+    /**
+     * Updates the movement state of the car.
+     * Applies base Vehicle physics, locks vertical movement,
+     * and enforces simple boundary bouncing on X and Z axes.
+     * @param interval
+     */
+    @Override
+    public void update(float interval) {
+
+        // Applies vehicle physics (speed & acceleration)
+        super.update(interval);
+
+        Vector3f pos = getPosition();  // Current position
+        Vector3f vel = getVelocity();  // Current velocity
+
+        // Locks Y movement (car stays on the ground)
+        pos.y = groundY;
+        vel.y = 0;
+
+        // Bounces X axis (boundary constraint)
+        if (Math.abs(pos.x) > 15) {
+            vel.x = -vel.x;
+        }
+
+        // Bounces Z axis (boundary constraint)
+        if (Math.abs(pos.z) > 15) {
+            vel.z = -vel.z;
+        }
     }
 
     // TODO: Implement Car-specific logic
