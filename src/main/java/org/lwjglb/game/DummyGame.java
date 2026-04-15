@@ -73,7 +73,11 @@ public class DummyGame implements IGameLogic {
 
 
     private boolean testModeActive = false;   // Tracks whether the Collision Test is active
+
     private boolean isTKeyPressedLastFrame = false;  // Tracks whether the "T" key is pressed last
+    private boolean isCKeyPressedLastFrame = false;  // Tracks whether the "C" key is pressed last
+    private boolean isPKeyPressedLastFrame = false;  // Tracks whether the "P" key is pressed last
+    private boolean isRKeyPressedLastFrame = false;  // Tracks whether the "R" key is pressed last
 
     private java.util.Random random = new java.util.Random();  // Generates random numbers
 
@@ -195,6 +199,27 @@ public class DummyGame implements IGameLogic {
         } else if (window.isKeyPressed(GLFW_KEY_2)) {
             pointLightPos.y -= 0.5f;
         }
+
+        // Spawns Car
+        boolean cPressed = window.isKeyPressed(GLFW_KEY_C);
+        if (cPressed && !isCKeyPressedLastFrame) {
+            spawnCar();
+        }
+        isCKeyPressedLastFrame = cPressed;
+
+        // Spawns Plane
+        boolean pPressed = window.isKeyPressed(GLFW_KEY_P);
+        if (pPressed && !isPKeyPressedLastFrame) {
+            spawnPlane();
+        }
+        isPKeyPressedLastFrame = pPressed;
+
+        // Resets Scene
+        boolean rPressed = window.isKeyPressed(GLFW_KEY_R);
+        if (rPressed && !isRKeyPressedLastFrame) {
+            loadDefaultScene();
+        }
+        isRKeyPressedLastFrame = rPressed;
 
         // TODO: Implement Vehicle control - the last added (GLFW_KEY_UP, GLFW_KEY_DOWN, GLFW_KEY_LEFT, GLFW_KEY_RIGHT)
 
