@@ -1,4 +1,5 @@
 package org.lwjglb.engine.items;
 
-public class Car extends GameItem {
+public class Car extends Vehicle {
+    // TODO: Implement Car-specific logic
 }
