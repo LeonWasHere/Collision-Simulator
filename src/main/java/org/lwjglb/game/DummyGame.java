@@ -6,22 +6,18 @@ import static org.lwjgl.glfw.GLFW.*;
 
 import static org.lwjgl.opengl.GL11.*;
 
-import org.lwjglb.engine.IGameLogic;
-import org.lwjglb.engine.MouseInput;
-import org.lwjglb.engine.Scene;
-import org.lwjglb.engine.SceneLight;
-import org.lwjglb.engine.Window;
+import org.lwjglb.engine.*;
 import org.lwjglb.engine.graph.Camera;
 import org.lwjglb.engine.graph.Mesh;
 import org.lwjglb.engine.graph.Renderer;
 import org.lwjglb.engine.graph.lights.DirectionalLight;
 import org.lwjglb.engine.graph.lights.PointLight;
 import org.lwjglb.engine.graph.weather.Fog;
-import org.lwjglb.engine.items.GameItem;
-import org.lwjglb.engine.items.SkyBox;
+import org.lwjglb.engine.items.*;
 import org.lwjglb.engine.loaders.assimp.StaticMeshesLoader;
 
 import java.lang.Math;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -71,6 +67,10 @@ public class DummyGame implements IGameLogic {
     private Vector3f pointLightPos;
 
     private GameItem t;
+
+    private boolean isCollisionTestActive = false;   // Tracks whether the Collision Test is active
+
+    private boolean isTKeyPressedLastFrame = false;  // Tracks whether the "T" key is pressed last
 
     public DummyGame() {
         renderer = new Renderer();
@@ -186,6 +186,10 @@ public class DummyGame implements IGameLogic {
     public void input(Window window, MouseInput mouseInput) {
         sceneChanged = false;
         cameraInc.set(0, 0, 0);
+        // Executes the collision test once "T" is pressed
+        if (window.isKeyPressed(GLFW_KEY_T)) {
+            executeCollisionTest();
+        }
         if (window.isKeyPressed(GLFW_KEY_W)) {
             sceneChanged = true;
             cameraInc.z = -1;
@@ -235,6 +239,62 @@ public class DummyGame implements IGameLogic {
 
     java.util.Random r = new java.util.Random();
 
+    /**
+     * Executes a predefined collision test scenario.
+     * Clears the scene, loads meshes, spawns test vehicles and planes,
+     * and prints a message to the console.
+     */
+    private void executeCollisionTest() {
+        try {
+            scene.removeAll();
+
+            // Loads meshes (reuses the existing ones)
+            Mesh[] terrainMesh = StaticMeshesLoader.load(
+                    "src/main/resources/models/terrain/terrain.obj",
+                    "src/main/resources/models/terrain");
+            Mesh[] carMesh = StaticMeshesLoader.load(
+                    "src/main/resources/models/russ/Chevrolet_Camaro_SS_Low.obj",
+                    "src/main/resources/models/russ");
+            Mesh[] planeMesh = StaticMeshesLoader.load(
+                    "src/main/resources/models/russ/toyPlane.obj",
+                    "src/main/resources/models/russ");
+
+            GameItem terrain = new GameItem(terrainMesh);
+            terrain.setPosition(0.0f, 0.0f, 0.0f);
+            terrain.setScale(100.0f);
+
+            // Stages Car Test
+            Car car1 = new Car(carMesh);
+            car1.setPosition(-5.0f, 0.0f, 0.0f);
+            car1.setVelocity(0.02f, 0.0f, 0.0f);
+
+            Car car2 = new Car(carMesh);
+            car2.setPosition(5.0f, 0.0f, 0.0f);
+            car2.setVelocity(-0.02f, 0.0f, 0.0f);
+
+            // Stages Plane Test
+            Plane plane1 = new Plane(planeMesh);
+            plane1.setPosition(-5.0f, 5.0f, 0.0f);
+            plane1.setVelocity(0.02f, 0.0f, 0.0f);
+
+            Plane plane2 = new Plane(planeMesh);
+            plane2.setPosition(5.0f, 5.0f, 0.0f);
+            plane2.setVelocity(-0.0f, 0.0f, 0.0f);
+
+            // Adds to scene
+            scene.addGameItem(car1);
+            scene.addGameItem(car2);
+            scene.addGameItem(plane1);
+            scene.addGameItem(plane2);
+
+            // Prints info to the console
+            System.out.println("Collision test started (T key)");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     @Override
     public void update(float interval, MouseInput mouseInput, Window window) {
 
@@ -262,6 +322,17 @@ public class DummyGame implements IGameLogic {
 
         // Get location of each GameItem
         List<GameItem> gameItems = scene.getgameItems();
+
+        // Filters only Vehicle objects
+        List<Vehicle> vehicles = new ArrayList<Vehicle>();
+
+        // Determines if the GameItem is a Vehicle object
+        for (GameItem item : gameItems) {
+            if (item instanceof Vehicle) {
+                vehicles.add((Vehicle) item);
+            }
+        }
+
         System.out.println();
         for (GameItem gameItem1 : gameItems) {
             System.out.println();
@@ -272,6 +343,9 @@ public class DummyGame implements IGameLogic {
                 }
             }
         }
+
+        // Runs collision detection
+        CollisionManager.manageVehicleCollision(vehicles);
 
         if (mouseInput.isRightButtonPressed()) {
             // Update camera based on mouse            

@@ -70,6 +70,10 @@ public class GameItem  extends Thread {
         this.position.z = z;
     }
 
+    public final Vector3f getVelocity() {
+        return velocity;
+    }
+
     public final void setVelocity(float x, float y, float z) {
         this.velocity.x = x;
         this.velocity.y = y;
