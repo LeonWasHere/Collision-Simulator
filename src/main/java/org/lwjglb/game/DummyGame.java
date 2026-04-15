@@ -187,9 +187,9 @@ public class DummyGame implements IGameLogic {
         }
 
         // Directional light rotation (-/=)
-        if (window.isKeyPressed(GLFW_KEY_MINUS)) {
+        if (window.isKeyPressed(GLFW_KEY_LEFT_BRACKET)) {
             angleInc -= 0.05f;
-        } else if (window.isKeyPressed(GLFW_KEY_EQUAL)) {
+        } else if (window.isKeyPressed(GLFW_KEY_RIGHT_BRACKET)) {
             angleInc += 0.05f;
         } else {
             angleInc = 0;
@@ -223,7 +223,35 @@ public class DummyGame implements IGameLogic {
         }
         isRKeyPressedLastFrame = rPressed;
 
-        // TODO: Implement Vehicle control - the last added (GLFW_KEY_UP, GLFW_KEY_DOWN, GLFW_KEY_LEFT, GLFW_KEY_RIGHT)
+        if (lastVehicleAdded != null) {
+
+            Vector3f velocity = lastVehicleAdded.getVelocity();
+
+            // Forward / Backward (Z axis)
+            if (window.isKeyPressed(GLFW_KEY_UP)) {
+                velocity.z -= 0.01f;
+            }
+            if (window.isKeyPressed(GLFW_KEY_DOWN)) {
+                velocity.z += 0.01f;
+            }
+
+            // Left / Right (X axis)
+            if (window.isKeyPressed(GLFW_KEY_LEFT)) {
+                velocity.x -= 0.01f;
+            }
+            if (window.isKeyPressed(GLFW_KEY_RIGHT)) {
+                velocity.x += 0.01f;
+            }
+
+            // Speed control
+            if (window.isKeyPressed(GLFW_KEY_EQUAL)) {
+                velocity.mul(1.05f);
+            }
+            if (window.isKeyPressed(GLFW_KEY_MINUS)) {
+                velocity.mul(0.95f);
+            }
+
+        }
 
         // TODO: Implement GUI actions (Add Car, Add Plane, Clear Screen)
     }
