@@ -81,6 +81,8 @@ public class DummyGame implements IGameLogic {
 
     private java.util.Random random = new java.util.Random();  // Generates random numbers
 
+    private Vehicle lastVehicleAdded;  // Stores the most recently added vehicle
+
     /**
      * Default constructor for DummyGame.
      * Initializes the renderer, camera, movement vector,
@@ -245,6 +247,8 @@ public class DummyGame implements IGameLogic {
 
             scene.addGameItem(car);  // Adds the car to the scene
 
+            lastVehicleAdded = car;  // Tracks this car as the last added vehicle
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -268,6 +272,8 @@ public class DummyGame implements IGameLogic {
             plane.setVelocity(0.01f, 0.005f, 0.01f);
 
             scene.addGameItem(plane);  // Adds the plane to the scene
+
+            lastVehicleAdded = plane;  // Tracks this plane as the last added vehicle
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -338,6 +344,8 @@ public class DummyGame implements IGameLogic {
     private void loadDefaultScene() {
         try {
             scene.removeAll();
+
+            lastVehicleAdded = null;  // No active vehicle after reset
 
             // Setup Terrain
             Mesh[] terrainMesh = StaticMeshesLoader.load("src/main/resources/models/terrain/terrain.obj",
