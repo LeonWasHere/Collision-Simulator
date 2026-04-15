@@ -1,0 +1,20 @@
+# Author: Leon Wasiliew
+# Date: 2026-04-15
+# Description: .gitignore for Java LWJGL Collision Simulator project.
+
+# Compiled files
+*.class
+
+# IDE folders
+*.iml
+.idea/
+.vscode/
+
+# Build folders
+bin/
+build/
+target/
+out/
+
+# Logs
+*.log

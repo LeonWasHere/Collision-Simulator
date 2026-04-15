@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>JAVA</ID>
+  <OriginalElement />
+  <nodes>
+    <node x="112.5" y="320.0">org.lwjglb.engine.items.Plane</node>
+    <node x="16.5" y="423.0">org.lwjglb.engine.items.Car</node>
+    <node x="0.0" y="0.0">org.lwjglb.engine.items.GameItem</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="org.lwjglb.engine.items.Car" target="org.lwjglb.engine.items.GameItem">
+      <point x="0.0" y="-13.0" />
+      <point x="59.0" y="295.0" />
+      <point x="53.0" y="295.0" />
+      <point x="-53.0" y="135.0" />
+    </edge>
+    <edge source="org.lwjglb.engine.items.Plane" target="org.lwjglb.engine.items.GameItem">
+      <point x="0.0" y="-13.0" />
+      <point x="153.0" y="295.0" />
+      <point x="159.0" y="295.0" />
+      <point x="53.0" y="135.0" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic Group" zoom="1.0" x="324.0" y="395.0" />
+  <SelectedNodes>
+    <node>org.lwjglb.engine.items.Car</node>
+  </SelectedNodes>
+  <Categories>
+    <Category>Fields</Category>
+  </Categories>
+  <SCOPE>All</SCOPE>
+  <VISIBILITY>private</VISIBILITY>
+</Diagram>
+
