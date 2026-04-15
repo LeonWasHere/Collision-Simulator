@@ -82,5 +82,15 @@ public class Plane extends Vehicle {
         }
     }
 
-    // TODO: Implement Plane-specific logic
+    @Override
+    public void collide(Vehicle other) {
+
+        Vector3f vel = getVelocity();  // Current velocity vector
+
+        // Drops downward (simulates altitude loss)
+        vel.y = -0.05f;
+
+        // Prints info to the console
+        System.out.println("Plane collision (descending)");
+    }
 }

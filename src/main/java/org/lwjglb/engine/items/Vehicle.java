@@ -97,4 +97,14 @@ public class Vehicle extends GameItem {
         // Applies basic movement
         getVelocity().z = speed;
     }
+
+    /**
+     * Handles a basic collision event between this game item and another.
+     * @param other
+     */
+    public void collide(Vehicle other) {
+        // Prints info to the console
+        System.out.println("'" + this.getClass().getSimpleName() + "' collided with "
+                + other.getClass().getSimpleName());
+    }
 }

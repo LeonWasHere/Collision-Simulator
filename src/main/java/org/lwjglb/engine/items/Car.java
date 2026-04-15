@@ -75,5 +75,20 @@ public class Car extends Vehicle {
         }
     }
 
-    // TODO: Implement Car-specific logic
+    /**
+     * Handles a basic collision event between a car and another game item.
+     * @param other
+     */
+    @Override
+    public void collide(Vehicle other) {
+
+        Vector3f vel = getVelocity();  // Current velocity vector
+
+        // Reverses horizontal direction (bounce)
+        vel.x = -vel.x;
+        vel.z = -vel.z;
+
+        // Prints info to the console
+        System.out.println("Car collision (bounce)");
+    }
 }
