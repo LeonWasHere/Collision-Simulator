@@ -14,7 +14,7 @@ import org.lwjglb.engine.graph.Mesh;
 
 public class Plane extends Vehicle {
 
-    private float maxSpeed = 0.05f;  // Keeps plane slow
+    // private float maxSpeed = 0.05f;  // Keeps plane slow
 
     /**
      * Default constructor for Plane.
@@ -53,35 +53,39 @@ public class Plane extends Vehicle {
     @Override
     public void update(float interval) {
 
-        // Applies acceleration to speed
-        super.update(interval);
+        Vector3f pos = getPosition();  // Retrieves current plane position
+        Vector3f vel = getVelocity();  // Retrieves current plane velocity
 
-        Vector3f vel = getVelocity();  // Current velocity vector
-
-        // Limits speed
-        if (vel.length() > maxSpeed) {
-            vel.normalize().mul(maxSpeed);
-        }
+        // Applies velocity to position for 3D movement
+        pos.x += vel.x;
+        pos.y += vel.y;
+        pos.z += vel.z;
     }
 
-    /**
-     * Handles a basic collision event between a plane and another vehicle.
-     * @param other
-     */
     @Override
     public void collide(Vehicle other) {
 
-        Vector3f vel = getVelocity();  // Current velocity vector
+        Vector3f pos = getPosition();             // Stores the position of the vehicle
+        Vector3f otherPos = other.getPosition();  // Stores the position of another vehicle
+        Vector3f vel = getVelocity();             // Stores plane velocity
 
-        // Simulates downward drop on collision
-        vel.y = -Math.abs(vel.y) - 0.02f;
+        // Calculates direction pointing away from the collision
+        Vector3f pushDir = new Vector3f(pos).sub(otherPos);
 
-        // Applies dampening for realism
-        vel.x *= 0.8f;
-        vel.y *= 0.8f;
-        vel.z *= 0.8f;
+        // Normalizes only if direction is not zero
+        if (pushDir.lengthSquared() > 0) {
+            pushDir.normalize();
+        }
 
-        // Optional debug
-        // System.out.println("Plane collision (descending)");
+        // Calculates dor product to determine if plane is moving toward the collision
+        float dot = vel.dot(pushDir);
+
+        // Reflects velocity only when moving into collision
+        if (dot < 0) {
+            vel.sub(new Vector3f(pushDir).mul(2 * dot));
+        }
+
+        // Applies small offset to prevent repeated collision triggers
+        pos.add(new Vector3f(pushDir).mul(0.2f));
     }
 }

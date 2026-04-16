@@ -5,11 +5,9 @@ package org.lwjglb.game;
  * Subject: INFT4000 - Special Topics 1
  * Creation Date: 2026-04-15
  * Modification Date: 2026-04-15
- * Description: Main...
- * Resource:
- * - Russ
- * - https://lwjglgamedev.gitbooks.io/3d-game-development-with-lwjgl/content/
- *
+ * Description: Main serves as the application entry point.
+ * It initializes the LWJGL-based game engine, configures window options,
+ * launches the simulation loop, and displays the Swing-based GameGUI control panel.
  */
 
 import org.lwjglb.engine.GameEngine;

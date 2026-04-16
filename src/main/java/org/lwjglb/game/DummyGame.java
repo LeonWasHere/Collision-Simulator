@@ -68,6 +68,8 @@ public class DummyGame implements IGameLogic {
     private static final float WORLD_MIN_Z = -50.0f;
     private static final float WORLD_MAX_Z = 50.0f;
 
+    private static final float CAR_GROUND_OFFSET = -1.2f;
+
     private final Vector3f cameraInc;
     private final Renderer renderer;
     private final Camera camera;
@@ -147,7 +149,7 @@ public class DummyGame implements IGameLogic {
         pointLightPos = new Vector3f(0.0f, 25.0f, 0.0f);
 
         // Point light setup
-        Vector3f pointLightColour = new Vector3f(0.0f, 1.0f, 0.0f);
+        Vector3f pointLightColour = new Vector3f(1.0f, 1.0f, 1.0f);
         PointLight.Attenuation attenuation = new PointLight.Attenuation(1, 0.0f, 0);
         PointLight pointLight = new PointLight(pointLightColour, pointLightPos, lightIntensity, attenuation);
         sceneLight.setPointLightList(new PointLight[]{pointLight});
@@ -393,7 +395,23 @@ public class DummyGame implements IGameLogic {
 
                 } else if (vehicle instanceof Plane) {
 
-                    // Planes bounce vertically
+                    if (pos.x < WORLD_MIN_X) {
+                        pos.x = WORLD_MIN_X;
+                        vel.x *= -1;
+                    } else if (pos.x > WORLD_MAX_X) {
+                        pos.x = WORLD_MAX_X;
+                        vel.x *= -1;
+                    }
+
+                    if (pos.z < WORLD_MIN_Z) {
+                        pos.z = WORLD_MIN_Z;
+                        vel.z *= -1;
+                    } else if (pos.z > WORLD_MAX_Z) {
+                        pos.z = WORLD_MAX_Z;
+                        vel.z *= -1;
+                    }
+
+                    // Y bounce
                     if (pos.y < WORLD_MIN_Y) {
                         pos.y = WORLD_MIN_Y;
                         vel.y *= -1;
@@ -415,48 +433,54 @@ public class DummyGame implements IGameLogic {
         try {
             scene.removeAll();
 
-            // Loads meshes (reuses the existing ones)
+            // Loads terrain mesh
             Mesh[] terrainMesh = StaticMeshesLoader.load(
                     "src/main/resources/models/terrain/terrain.obj",
                     "src/main/resources/models/terrain");
+
+            GameItem terrain = new GameItem(terrainMesh);
+            terrain.setPosition(0.0f, CAR_GROUND_OFFSET, 0.0f);
+            terrain.setScale(50.0f);
+
+            // Loads car mesh
             Mesh[] carMesh = StaticMeshesLoader.load(
                     "src/main/resources/models/russ/Chevrolet_Camaro_SS_Low.obj",
                     "src/main/resources/models/russ");
-            Mesh[] planeMesh = StaticMeshesLoader.load(
-                    "src/main/resources/models/russ/toyPlane.obj",
-                    "src/main/resources/models/russ");
-
-            GameItem terrain = new GameItem(terrainMesh);
-            terrain.setPosition(0.0f, 0.0f, 0.0f);
-            terrain.setScale(100.0f);
 
             // Creates two car objects
             Car car1 = new Car(carMesh);
             Car car2 = new Car(carMesh);
 
-            // Sets the position of the two cars
-            car1.setPosition(-5.0f, 0.0f, 0.0f);
-            car2.setPosition(5.0f, 0.0f, 0.0f);
+            // Puts them facing each other
+            car1.setPosition(-10.0f, 0.0f, 0.0f);
+            car2.setPosition(10.0f, 0.0f, 0.0f);
 
             // Sets the speed of the two cars
-            car1.setVelocity(0.02f, 0.0f, 0.0f);
-            car2.setVelocity(-0.02f, 0.0f, 0.0f);
+            car1.setVelocity(0.03f, 0.0f, 0.0f);
+            car2.setVelocity(-0.03f, 0.0f, 0.0f);
+
+            // Loads plane mesh
+            Mesh[] planeMesh = StaticMeshesLoader.load(
+                    "src/main/resources/models/russ/toyPlane.obj",
+                    "src/main/resources/models/russ");
 
             // Creates two plane objects
             Plane plane1 = new Plane(planeMesh);
             Plane plane2 = new Plane(planeMesh);
 
-            // Sets the position of the two planes
-            plane1.setPosition(-5.0f, 5.0f, 0.0f);
-            plane2.setPosition(5.0f, 5.0f, 0.0f);
+            // Gives them height and forward motion
+            plane1.setPosition(-10.0f, 8.0f, 0.0f);
+            plane2.setPosition(10.0f, 8.0f, 0.0f);
 
-            // Sets the speed of the two planes
-            plane1.setVelocity(0.02f, 0.0f, 0.0f);
-            plane2.setVelocity(-0.0f, 0.0f, 0.0f);
+            // Sets the speed of the planes
+            plane1.setVelocity(0.03f, 0.01f, 0.0f);
+            plane2.setVelocity(-0.03f, 0.01f, 0.0f);
 
             // Adds to scene
             scene.setGameItems(new GameItem[]{
-                    car1, car2, plane1, plane2
+                    terrain,
+                    car1, car2,
+                    plane1, plane2
             });
 
             // Prints info to the console
@@ -478,8 +502,8 @@ public class DummyGame implements IGameLogic {
                     "src/main/resources/models/terrain");
 
             GameItem terrain = new GameItem(terrainMesh);
-            terrain.setPosition(0.00f, -15.000f, 0.000f);
-            terrain.setScale(100.0f);
+            terrain.setPosition(0.0f, CAR_GROUND_OFFSET, 0.0f);
+            terrain.setScale(50.0f);
 
             scene.setGameItems(new GameItem[]{terrain});
 

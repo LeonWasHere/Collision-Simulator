@@ -75,7 +75,7 @@
           <editable value="false"/>
           <lineWrap value="true"/>
           <wrapStyleWord value="true"/>
-          <text value="Controls:\nAdd Car / Plane\nClear / Reset\nFaster Slower Left Right Up Down (last vehicle only)"/>
+          <text value="Add Car / Plane, Clear / Reset, Camera: W A S D + Z/X, Rotate Camera (RMB), Light: [ ] and 1/2, Spawn: C (Car), P (Plane), Reset: R, Toggle Test: T, Last Vehicle: Arrow Keys (move), = / - (speed), Plane‑only vertical via GUI Up/Down, GUI: Faster / Slower / Left / Right / Up / Down"/>
         </properties>
       </component>
 
