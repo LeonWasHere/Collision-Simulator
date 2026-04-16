@@ -47,8 +47,7 @@ public class Car extends Vehicle {
 
     /**
      * Updates the movement state of the car.
-     * Applies base Vehicle physics, locks vertical movement,
-     * and enforces simple boundary bouncing on X and Z axes.
+     * Applies base Vehicle physics and enforces ground-only behavior.
      * @param interval
      */
     @Override
@@ -60,23 +59,16 @@ public class Car extends Vehicle {
         Vector3f pos = getPosition();  // Current position
         Vector3f vel = getVelocity();  // Current velocity
 
-        // Locks Y movement (car stays on the ground)
+        // Locks Y movement to the ground
         pos.y = groundY;
+
+        // Stops vertical movement
         vel.y = 0;
 
-        // Bounces X axis (boundary constraint)
-        if (Math.abs(pos.x) > 15) {
-            vel.x = -vel.x;
-        }
-
-        // Bounces Z axis (boundary constraint)
-        if (Math.abs(pos.z) > 15) {
-            vel.z = -vel.z;
-        }
     }
 
     /**
-     * Handles a basic collision event between a car and another game item.
+     * Handles a basic collision event between a car and another vehicle.
      * @param other
      */
     @Override
@@ -84,11 +76,11 @@ public class Car extends Vehicle {
 
         Vector3f vel = getVelocity();  // Current velocity vector
 
-        // Reverses horizontal direction (bounce)
+        // Reverses horizontal movement
         vel.x = -vel.x;
         vel.z = -vel.z;
 
-        // Prints info to the console
-        System.out.println("Car collision (bounce)");
+        // Optional debug
+        // System.out.println("Car collision (bounce)");
     }
 }

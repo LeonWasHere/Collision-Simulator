@@ -54,8 +54,19 @@ import java.util.List;
  */
 public class DummyGame implements IGameLogic {
 
+    // Constant for mouse rotation sensitivity when adjusting the camera
     private static final float MOUSE_SENSITIVITY = 0.2f;
+
+    // Constant for the camera movement step size per update
     private static final float CAMERA_POS_STEP = 0.40f;
+
+    // Constants defining the world boundaries for object placement and movement
+    private static final float WORLD_MIN_X = -50.0f;
+    private static final float WORLD_MAX_X = 50.0f;
+    private static final float WORLD_MIN_Y = -0.0f;
+    private static final float WORLD_MAX_Y = 30.0f;
+    private static final float WORLD_MIN_Z = -50.0f;
+    private static final float WORLD_MAX_Z = 50.0f;
 
     private final Vector3f cameraInc;
     private final Renderer renderer;
@@ -305,6 +316,61 @@ public class DummyGame implements IGameLogic {
 
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    /**
+     * Enforces world movement constraints for all Vehicle objects (including Car & Plane).
+     * Applies boundary checks on each axis, reverses velocity when limits are exceeded.
+     */
+    private void enforceVehicleConstraints() {
+
+        // Iterates through all GameItems in the scene
+        for (GameItem item : scene.getgameItems()) {
+
+            // Processes only Vehicle objects
+            if (item instanceof Vehicle) {
+
+                Vehicle vehicle = (Vehicle) item;
+                Vector3f pos = vehicle.getPosition();
+                Vector3f vel = vehicle.getVelocity();
+
+                // X-axis boundaries (horizontal bounce)
+                if (pos.x < WORLD_MIN_X) {
+                    pos.x = WORLD_MIN_X;
+                    vel.x *= -1;
+                } else if (pos.x > WORLD_MAX_X) {
+                    pos.x = WORLD_MAX_X;
+                    vel.x *= -1;
+                }
+
+                // Z-axis boundaries (depth bounce)
+                if (pos.z < WORLD_MIN_Z) {
+                    pos.z = WORLD_MIN_Z;
+                    vel.z *= -1;
+                } else if (pos.z > WORLD_MAX_Z) {
+                    pos.z = WORLD_MAX_Z;
+                    vel.z *= -1;
+                }
+
+                // Y-axis behavior depends on vehicle type
+                if (vehicle instanceof Car) {
+
+                    // Cars do not move vertically
+                    vel.y = 0;
+
+                } else if (vehicle instanceof Plane) {
+
+                    // Planes bounce vertically
+                    if (pos.y < WORLD_MIN_Y) {
+                        pos.y = WORLD_MIN_Y;
+                        vel.y *= -1;
+                    } else if (pos.y > WORLD_MAX_Y) {
+                        pos.y = WORLD_MAX_Y;
+                        vel.y *= -1;
+                    }
+                }
+            }
         }
     }
 
