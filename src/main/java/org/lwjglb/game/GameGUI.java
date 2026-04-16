@@ -16,18 +16,31 @@ public class GameGUI {
 
     private JPanel panelMain;
 
+    private JTextArea keyboardHelp;
+
     private JButton addCarButton;
     private JButton addPlaneButton;
     private JButton clearButton;
     private JButton resetButton;
+    private JButton fasterButton;
+    private JButton slowerButton;
+    private JButton leftButton;
+    private JButton rightButton;
+    private JButton upButton;
+    private JButton downButton;
 
-    private JTextArea keyboardHelp;
 
     // Defines command flags used by the game loop
     private static boolean addCarCommand = false;
     private static boolean addPlaneCommand = false;
     private static boolean clearCommand = false;
     private static boolean resetCommand = false;
+    private static boolean fasterCommand = false;
+    private static boolean slowerCommand = false;
+    private static boolean leftCommand = false;
+    private static boolean rightCommand = false;
+    private static boolean upCommand = false;
+    private static boolean downCommand = false;
 
     /**
      * Constructs the GUI and attaches button listeners that
@@ -66,6 +79,14 @@ public class GameGUI {
             resetCommand = true;
             System.out.println("GUI: Reset");
         });
+
+        // Defines all Vehicle-based controls (Last Vehicle Only)
+        fasterButton.addActionListener(e -> fasterCommand = true);
+        slowerButton.addActionListener(e -> slowerCommand = true);
+        leftButton.addActionListener(e -> leftCommand = true);
+        rightButton.addActionListener(e -> rightCommand = true);
+        upButton.addActionListener(e -> upCommand = true);
+        downButton.addActionListener(e -> downCommand = true);
     }
 
     /**
@@ -115,4 +136,12 @@ public class GameGUI {
         resetCommand = false;
         return value;
     }
+
+    // Getters for the Vehicle-based command flags
+    public static boolean getFasterCommand() { boolean v = fasterCommand; fasterCommand = false; return v; }
+    public static boolean getSlowerCommand() { boolean v = slowerCommand; slowerCommand = false; return v; }
+    public static boolean getLeftCommand() { boolean v = leftCommand; leftCommand = false; return v; }
+    public static boolean getRightCommand() { boolean v = rightCommand; rightCommand = false; return v; }
+    public static boolean getUpCommand() { boolean v = upCommand; upCommand = false; return v; }
+    public static boolean getDownCommand() { boolean v = downCommand; downCommand = false; return v; }
 }

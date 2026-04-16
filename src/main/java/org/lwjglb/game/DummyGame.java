@@ -262,6 +262,18 @@ public class DummyGame implements IGameLogic {
                 velocity.mul(0.95f);
             }
 
+            // GUI Speed Control
+            if (GameGUI.getFasterCommand()) lastVehicleAdded.getVelocity().mul(1.05f);
+            if (GameGUI.getSlowerCommand()) lastVehicleAdded.getVelocity().mul(0.95f);
+
+            // GUI Direction Control
+            if (GameGUI.getLeftCommand())  velocity.x -= 0.01f;
+            if (GameGUI.getRightCommand()) velocity.x += 0.01f;
+            if (lastVehicleAdded instanceof Plane) {
+                if (GameGUI.getUpCommand()) velocity.y += 0.01f;
+                if (GameGUI.getDownCommand()) velocity.y -= 0.01f;
+            }
+
         }
 
         // Spawns a car when the GUI issues the "Add Car" command
