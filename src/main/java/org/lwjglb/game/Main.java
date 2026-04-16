@@ -47,6 +47,5 @@ public class Main {
 
         // Setup jFrame for controls
         GameGUI.guiSetup();
-
     }
 }
