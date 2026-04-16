@@ -54,8 +54,19 @@ import java.util.List;
  */
 public class DummyGame implements IGameLogic {
 
+    // Constant for mouse rotation sensitivity when adjusting the camera
     private static final float MOUSE_SENSITIVITY = 0.2f;
+
+    // Constant for the camera movement step size per update
     private static final float CAMERA_POS_STEP = 0.40f;
+
+    // Constants defining the world boundaries for object placement and movement
+    private static final float WORLD_MIN_X = -50.0f;
+    private static final float WORLD_MAX_X = 50.0f;
+    private static final float WORLD_MIN_Y = -0.0f;
+    private static final float WORLD_MAX_Y = 30.0f;
+    private static final float WORLD_MIN_Z = -50.0f;
+    private static final float WORLD_MAX_Z = 50.0f;
 
     private final Vector3f cameraInc;
     private final Renderer renderer;
@@ -73,9 +84,15 @@ public class DummyGame implements IGameLogic {
 
 
     private boolean testModeActive = false;   // Tracks whether the Collision Test is active
+
     private boolean isTKeyPressedLastFrame = false;  // Tracks whether the "T" key is pressed last
+    private boolean isCKeyPressedLastFrame = false;  // Tracks whether the "C" key is pressed last
+    private boolean isPKeyPressedLastFrame = false;  // Tracks whether the "P" key is pressed last
+    private boolean isRKeyPressedLastFrame = false;  // Tracks whether the "R" key is pressed last
 
     private java.util.Random random = new java.util.Random();  // Generates random numbers
+
+    private Vehicle lastVehicleAdded;  // Stores the most recently added vehicle
 
     /**
      * Default constructor for DummyGame.
@@ -181,9 +198,9 @@ public class DummyGame implements IGameLogic {
         }
 
         // Directional light rotation (-/=)
-        if (window.isKeyPressed(GLFW_KEY_MINUS)) {
+        if (window.isKeyPressed(GLFW_KEY_LEFT_BRACKET)) {
             angleInc -= 0.05f;
-        } else if (window.isKeyPressed(GLFW_KEY_EQUAL)) {
+        } else if (window.isKeyPressed(GLFW_KEY_RIGHT_BRACKET)) {
             angleInc += 0.05f;
         } else {
             angleInc = 0;
@@ -196,9 +213,90 @@ public class DummyGame implements IGameLogic {
             pointLightPos.y -= 0.5f;
         }
 
-        // TODO: Implement Vehicle control - the last added (GLFW_KEY_UP, GLFW_KEY_DOWN, GLFW_KEY_LEFT, GLFW_KEY_RIGHT)
+        // Spawns Car
+        boolean cPressed = window.isKeyPressed(GLFW_KEY_C);
+        if (cPressed && !isCKeyPressedLastFrame) {
+            spawnCar();
+        }
+        isCKeyPressedLastFrame = cPressed;
 
-        // TODO: Implement GUI actions (Add Car, Add Plane, Clear Screen)
+        // Spawns Plane
+        boolean pPressed = window.isKeyPressed(GLFW_KEY_P);
+        if (pPressed && !isPKeyPressedLastFrame) {
+            spawnPlane();
+        }
+        isPKeyPressedLastFrame = pPressed;
+
+        // Resets Scene
+        boolean rPressed = window.isKeyPressed(GLFW_KEY_R);
+        if (rPressed && !isRKeyPressedLastFrame) {
+            loadDefaultScene();
+        }
+        isRKeyPressedLastFrame = rPressed;
+
+        if (lastVehicleAdded != null) {
+
+            Vector3f velocity = lastVehicleAdded.getVelocity();
+
+            // Forward / Backward (Z axis)
+            if (window.isKeyPressed(GLFW_KEY_UP)) {
+                velocity.z -= 0.01f;
+            }
+            if (window.isKeyPressed(GLFW_KEY_DOWN)) {
+                velocity.z += 0.01f;
+            }
+
+            // Left / Right (X axis)
+            if (window.isKeyPressed(GLFW_KEY_LEFT)) {
+                velocity.x -= 0.01f;
+            }
+            if (window.isKeyPressed(GLFW_KEY_RIGHT)) {
+                velocity.x += 0.01f;
+            }
+
+            // Speed control
+            if (window.isKeyPressed(GLFW_KEY_EQUAL)) {
+                velocity.mul(1.05f);
+            }
+            if (window.isKeyPressed(GLFW_KEY_MINUS)) {
+                velocity.mul(0.95f);
+            }
+
+            // GUI Speed Control
+            if (GameGUI.getFasterCommand()) lastVehicleAdded.getVelocity().mul(1.05f);
+            if (GameGUI.getSlowerCommand()) lastVehicleAdded.getVelocity().mul(0.95f);
+
+            // GUI Direction Control
+            if (GameGUI.getLeftCommand())  velocity.x -= 0.01f;
+            if (GameGUI.getRightCommand()) velocity.x += 0.01f;
+            if (lastVehicleAdded instanceof Plane) {
+                if (GameGUI.getUpCommand()) velocity.y += 0.01f;
+                if (GameGUI.getDownCommand()) velocity.y -= 0.01f;
+            }
+
+        }
+
+        // Spawns a car when the GUI issues the "Add Car" command
+        if (GameGUI.getCarAddCommand()) {
+            spawnCar();
+        }
+
+        // Spawns a plane when the GUI issues the "Add Plane" command
+        if (GameGUI.getPlaneAddCommand()) {
+            spawnPlane();
+        }
+
+        // Clears the scene and reloads the default environment
+        if (GameGUI.getClearCommand()) {
+            scene.removeAll();
+            loadDefaultScene();
+            lastVehicleAdded = null;
+        }
+
+        // Resets the scene when the GUI issues the Reset command
+        if (GameGUI.getPlaneAddCommand()) {
+            loadDefaultScene();
+        }
     }
 
     /**
@@ -219,6 +317,8 @@ public class DummyGame implements IGameLogic {
             car.setVelocity(0.01f, 0.0f, 0.01f);
 
             scene.addGameItem(car);  // Adds the car to the scene
+
+            lastVehicleAdded = car;  // Tracks this car as the last added vehicle
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -244,8 +344,65 @@ public class DummyGame implements IGameLogic {
 
             scene.addGameItem(plane);  // Adds the plane to the scene
 
+            lastVehicleAdded = plane;  // Tracks this plane as the last added vehicle
+
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    /**
+     * Enforces world movement constraints for all Vehicle objects (including Car & Plane).
+     * Applies boundary checks on each axis, reverses velocity when limits are exceeded.
+     */
+    private void enforceVehicleConstraints() {
+
+        // Iterates through all GameItems in the scene
+        for (GameItem item : scene.getgameItems()) {
+
+            // Processes only Vehicle objects
+            if (item instanceof Vehicle) {
+
+                Vehicle vehicle = (Vehicle) item;
+                Vector3f pos = vehicle.getPosition();
+                Vector3f vel = vehicle.getVelocity();
+
+                // X-axis boundaries (horizontal bounce)
+                if (pos.x < WORLD_MIN_X) {
+                    pos.x = WORLD_MIN_X;
+                    vel.x *= -1;
+                } else if (pos.x > WORLD_MAX_X) {
+                    pos.x = WORLD_MAX_X;
+                    vel.x *= -1;
+                }
+
+                // Z-axis boundaries (depth bounce)
+                if (pos.z < WORLD_MIN_Z) {
+                    pos.z = WORLD_MIN_Z;
+                    vel.z *= -1;
+                } else if (pos.z > WORLD_MAX_Z) {
+                    pos.z = WORLD_MAX_Z;
+                    vel.z *= -1;
+                }
+
+                // Y-axis behavior depends on vehicle type
+                if (vehicle instanceof Car) {
+
+                    // Cars do not move vertically
+                    vel.y = 0;
+
+                } else if (vehicle instanceof Plane) {
+
+                    // Planes bounce vertically
+                    if (pos.y < WORLD_MIN_Y) {
+                        pos.y = WORLD_MIN_Y;
+                        vel.y *= -1;
+                    } else if (pos.y > WORLD_MAX_Y) {
+                        pos.y = WORLD_MAX_Y;
+                        vel.y *= -1;
+                    }
+                }
+            }
         }
     }
 
@@ -314,6 +471,8 @@ public class DummyGame implements IGameLogic {
         try {
             scene.removeAll();
 
+            lastVehicleAdded = null;  // No active vehicle after reset
+
             // Setup Terrain
             Mesh[] terrainMesh = StaticMeshesLoader.load("src/main/resources/models/terrain/terrain.obj",
                     "src/main/resources/models/terrain");
@@ -376,6 +535,8 @@ public class DummyGame implements IGameLogic {
 
         // Runs collision detection on all vehicles
         CollisionManager.manageVehicleCollision(vehicles);
+
+        enforceVehicleConstraints();
 
         // Applies camera movement based on the input
         camera.movePosition(

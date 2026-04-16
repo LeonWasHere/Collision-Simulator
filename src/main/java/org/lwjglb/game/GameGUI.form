@@ -1,44 +1,84 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="org.lwjglb.game.GameGUI">
-  <grid id="27dc6" binding="panelMain" layout-manager="GridLayoutManager" row-count="3" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
-    <margin top="0" left="0" bottom="0" right="0"/>
+
+  <grid id="root" binding="panelMain" layout-manager="GridLayoutManager"
+        row-count="11" column-count="1"
+        same-size-horizontally="false" same-size-vertically="false"
+        hgap="2" vgap="2">
+
+    <margin top="5" left="5" bottom="5" right="5"/>
+
     <constraints>
-      <xy x="20" y="20" width="500" height="400"/>
+      <xy x="20" y="20" width="420" height="600"/>
     </constraints>
+
     <properties/>
+
+    <!-- REQUIRED by IntelliJ UI Designer -->
     <border type="none"/>
+
     <children>
-      <hspacer id="f3c2b">
-        <constraints>
-          <grid row="0" column="1" row-span="3" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false">
-            <minimum-size width="200" height="-1"/>
-          </grid>
-        </constraints>
-      </hspacer>
-      <component id="bcb3b" class="javax.swing.JButton" binding="clearButton">
-        <constraints>
-          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-        </constraints>
+
+      <component id="addCar" class="javax.swing.JButton" binding="addCarButton">
+        <constraints><grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1"/></constraints>
+        <properties><text value="Add Car"/></properties>
+      </component>
+
+      <component id="addPlane" class="javax.swing.JButton" binding="addPlaneButton">
+        <constraints><grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1"/></constraints>
+        <properties><text value="Add Plane"/></properties>
+      </component>
+
+      <component id="clear" class="javax.swing.JButton" binding="clearButton">
+        <constraints><grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1"/></constraints>
+        <properties><text value="Clear"/></properties>
+      </component>
+
+      <component id="reset" class="javax.swing.JButton" binding="resetButton">
+        <constraints><grid row="3" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1"/></constraints>
+        <properties><text value="Reset"/></properties>
+      </component>
+
+      <component id="faster" class="javax.swing.JButton" binding="fasterButton">
+        <constraints><grid row="4" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1"/></constraints>
+        <properties><text value="Faster"/></properties>
+      </component>
+
+      <component id="slower" class="javax.swing.JButton" binding="slowerButton">
+        <constraints><grid row="5" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1"/></constraints>
+        <properties><text value="Slower"/></properties>
+      </component>
+
+      <component id="left" class="javax.swing.JButton" binding="leftButton">
+        <constraints><grid row="6" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1"/></constraints>
+        <properties><text value="Left"/></properties>
+      </component>
+
+      <component id="right" class="javax.swing.JButton" binding="rightButton">
+        <constraints><grid row="7" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1"/></constraints>
+        <properties><text value="Right"/></properties>
+      </component>
+
+      <component id="up" class="javax.swing.JButton" binding="upButton">
+        <constraints><grid row="8" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1"/></constraints>
+        <properties><text value="Up"/></properties>
+      </component>
+
+      <component id="down" class="javax.swing.JButton" binding="downButton">
+        <constraints><grid row="9" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1"/></constraints>
+        <properties><text value="Down"/></properties>
+      </component>
+
+      <component id="help" class="javax.swing.JTextArea" binding="keyboardHelp">
+        <constraints><grid row="10" column="0" row-span="1" col-span="1" vsize-policy="6" hsize-policy="6" anchor="0" fill="3"/></constraints>
         <properties>
-          <text value="Clear"/>
+          <editable value="false"/>
+          <lineWrap value="true"/>
+          <wrapStyleWord value="true"/>
+          <text value="Controls:\nAdd Car / Plane\nClear / Reset\nFaster Slower Left Right Up Down (last vehicle only)"/>
         </properties>
       </component>
-      <component id="33ddc" class="javax.swing.JButton" binding="resetButton" default-binding="true">
-        <constraints>
-          <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-        </constraints>
-        <properties>
-          <text value="Reset"/>
-        </properties>
-      </component>
-      <component id="611d3" class="javax.swing.JButton" binding="addButton" default-binding="true">
-        <constraints>
-          <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-        </constraints>
-        <properties>
-          <text value="Add"/>
-        </properties>
-      </component>
+
     </children>
   </grid>
 </form>

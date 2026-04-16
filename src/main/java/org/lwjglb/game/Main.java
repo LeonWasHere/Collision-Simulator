@@ -1,19 +1,21 @@
 package org.lwjglb.game;
 
+/**
+ * Author: Leon Wasiliew
+ * Subject: INFT4000 - Special Topics 1
+ * Creation Date: 2026-04-15
+ * Modification Date: 2026-04-15
+ * Description: Main...
+ * Resource:
+ * - Russ
+ * - https://lwjglgamedev.gitbooks.io/3d-game-development-with-lwjgl/content/
+ *
+ */
+
 import org.lwjglb.engine.GameEngine;
 import org.lwjglb.engine.IGameLogic;
 import org.lwjglb.engine.Window;
 
-/**
- * Original code
- * URL:    https://lwjglgamedev.gitbooks.io/3d-game-development-with-lwjgl/content/
- * Author: Antonio Hernández Bejarano
- * <p>
- * Update Author:  Russ
- * Dec 9, 2018:  I started making the code easier for students to update and include their own shapes.
- * Goto DummyGame class to see how to add your own shapes.
- *
- */
 public class Main {
 
     public static void main(String[] args) {
@@ -32,7 +34,7 @@ public class Main {
             opts.compatibleProfile = true;
             opts.antialiasing = true;
             opts.frustumCulling = false;
-            GameEngine gameEng = new GameEngine("GAME", 1920, 1080, vSync, opts, gameLogic);
+            GameEngine gameEng = new GameEngine("Collision Simulator", 800, 800, vSync, opts, gameLogic);
             gameEng.start();
         } catch (Exception excp) {
             excp.printStackTrace();
@@ -47,6 +49,5 @@ public class Main {
 
         // Setup jFrame for controls
         GameGUI.guiSetup();
-
     }
 }
