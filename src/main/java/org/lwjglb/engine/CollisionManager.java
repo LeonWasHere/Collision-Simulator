@@ -11,6 +11,8 @@ package org.lwjglb.engine;
  * and suppresses repeated log messages for the same collision pair.
  */
 
+import org.joml.Vector3f;
+import org.lwjglb.engine.items.Plane;
 import org.lwjglb.engine.items.Vehicle;
 
 import java.util.HashSet;
@@ -31,40 +33,36 @@ public class CollisionManager {
      */
     public static void manageVehicleCollision(List<Vehicle> vehicles) {
 
-        // Compares each vehicle with every other vehicle
+        // Loops through all vehicles
         for (int i = 0; i < vehicles.size(); i++) {
-
             for (int j = i + 1; j < vehicles.size(); j++) {
 
-                Vehicle vehicle1 = vehicles.get(i);  // Assigns first vehicle in the pair
-                Vehicle vehicle2 = vehicles.get(j);  // Assigns second vehicles in the pair
+                // Retrieves two vehicles being compared
+                Vehicle vehicle1 = vehicles.get(i);
+                Vehicle vehicle2 = vehicles.get(j);
 
-                // Generates a unique key for this pair to track logging
+                // Generates a key for the vehicle pair
                 String key = generateLogKey(vehicle1, vehicle2);
 
-                // Triggers collision methods (if the vehicles are close enough)
-                if (checkVehicleCollision(vehicle1, vehicle2)) {
+                // Checks if the vehicles are colliding
+                if (check3DCollision(vehicle1, vehicle2)) {
+
+                    // Triggers collision
                     vehicle1.collide(vehicle2);
                     vehicle2.collide(vehicle1);
 
-                    // Logs the collision only the first time it occurs
+                    // Logs collision once per active pair
                     if (!activeCollisions.contains(key)) {
                         System.out.println("Collision Occurred: " +
                                 vehicle1.getClass().getSimpleName() +
-                                " <--> " + vehicle2.getClass().getSimpleName() +
-                                " at position (" +
-                                vehicle1.getPosition().x +
-                                ", " +
-                                vehicle1.getPosition().y +
-                                ", " +
-                                vehicle1.getPosition().z +
-                                ")"
-                        );
-                        // Marks this collision as logged
+                                " <--> " +
+                                vehicle2.getClass().getSimpleName());
+
                         activeCollisions.add(key);
                     }
+
                 } else {
-                    // Removes entry when collision ends
+                    // Removes key when vehicles are no longer colliding
                     activeCollisions.remove(key);
                 }
             }
@@ -72,26 +70,39 @@ public class CollisionManager {
     }
 
     /**
-     * Determines whether two vehicles are colliding based on distance.
-     * @param vehicle1
-     * @param vehicle2
+     * Determines whether two vehicles are colliding based on 3D distance.
+     * @param a
+     * @param b
      * @return
      */
-    private static boolean checkVehicleCollision(Vehicle vehicle1, Vehicle vehicle2) {
+    private static boolean check3DCollision(Vehicle a, Vehicle b) {
 
-        // Calculates the distance between the two vehicle positions
-        float distance = vehicle1.getPosition().distance(vehicle2.getPosition());
+        // Gets both positions of both vehicles
+        Vector3f pa = a.getPosition();
+        Vector3f pb = b.getPosition();
 
-        return distance < vehicleThreshold;  // Returns boolean determining collision
+        // Calculates axis difference
+        float dx = pa.x - pb.x;
+        float dy = pa.y - pb.y;
+        float dz = pa.z - pb.z;
+
+        // Calculates squared distance between vehicles
+        float distSquared = dx * dx + dy * dy + dz * dz;
+
+        // Computes combined collision radius with buffer
+        float radius = (a.getCollisionRadius() + b.getCollisionRadius()) * 1.1f;
+
+        // Compares squared values
+        return distSquared < radius * radius;
     }
 
     // Creates a consistent pair key
     private static String generateLogKey(Vehicle v1, Vehicle v2) {
 
-        int id1 = System.identityHashCode(v1);  // ...
-        int id2 = System.identityHashCode(v2);  // ...
+        int id1 = System.identityHashCode(v1);  // Stores unique ID for first vehicle
+        int id2 = System.identityHashCode(v2);  // Stores unique ID for second vehicle
 
-        // ...
+        // Ensures consistent ordering of pairs
         if (id1 < id2) {
             return id1 + "_" + id2;
         } else {

@@ -14,8 +14,9 @@ import org.lwjglb.engine.graph.Mesh;
 
 public class Vehicle extends GameItem {
 
-    protected float speed = 0.01f;        // Stores current forward movement speed
-    protected float acceleration = 0.0f;  // Stores rate at which speed increases or decreases
+    protected float speed = 0.01f;           // Stores current forward movement speed
+    protected float acceleration = 0.0f;     // Stores rate at which speed increases or decreases
+    protected float collisionRadius = 2.0f;  // Stores the collision radius
 
     /**
      * Default constructor for Vehicle.
@@ -106,5 +107,21 @@ public class Vehicle extends GameItem {
         // Prints info to the console
         System.out.println("'" + this.getClass().getSimpleName() + "' collided with "
                 + other.getClass().getSimpleName());
+    }
+
+    /**
+     * Returns the collision radius.
+     * @return
+     */
+    public float getCollisionRadius() {
+        return collisionRadius;
+    }
+
+    /**
+     * Sets the collision radius.
+     * @param radius
+     */
+    public void setCollisionRadius(float radius) {
+        this.collisionRadius = radius;
     }
 }
