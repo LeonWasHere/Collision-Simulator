@@ -536,6 +536,8 @@ public class DummyGame implements IGameLogic {
         // Runs collision detection on all vehicles
         CollisionManager.manageVehicleCollision(vehicles);
 
+        enforceVehicleConstraints();
+
         // Applies camera movement based on the input
         camera.movePosition(
                 cameraInc.x * CAMERA_POS_STEP,
