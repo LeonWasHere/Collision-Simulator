@@ -1,42 +1,56 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="org.lwjglb.game.GameGUI">
-  <grid id="27dc6" binding="panelMain" layout-manager="GridLayoutManager" row-count="3" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+  <grid id="root" binding="panelMain" layout-manager="GridLayoutManager" row-count="5" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="4">
     <margin top="0" left="0" bottom="0" right="0"/>
     <constraints>
-      <xy x="20" y="20" width="500" height="400"/>
+      <xy x="20" y="20" width="400" height="5538"/>
     </constraints>
     <properties/>
     <border type="none"/>
     <children>
-      <hspacer id="f3c2b">
-        <constraints>
-          <grid row="0" column="1" row-span="3" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false">
-            <minimum-size width="200" height="-1"/>
-          </grid>
-        </constraints>
-      </hspacer>
-      <component id="bcb3b" class="javax.swing.JButton" binding="clearButton">
+      <component id="carBtn" class="javax.swing.JButton" binding="addCarButton">
         <constraints>
           <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text value="Add Car"/>
+        </properties>
+      </component>
+      <component id="planeBtn" class="javax.swing.JButton" binding="addPlaneButton">
+        <constraints>
+          <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text value="Add Plane"/>
+        </properties>
+      </component>
+      <component id="clearBtn" class="javax.swing.JButton" binding="clearButton">
+        <constraints>
+          <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
           <text value="Clear"/>
         </properties>
       </component>
-      <component id="33ddc" class="javax.swing.JButton" binding="resetButton" default-binding="true">
+      <component id="resetBtn" class="javax.swing.JButton" binding="resetButton">
         <constraints>
-          <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+          <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
           <text value="Reset"/>
         </properties>
       </component>
-      <component id="611d3" class="javax.swing.JButton" binding="addButton" default-binding="true">
+      <component id="keyboardHelp" class="javax.swing.JTextArea" binding="keyboardHelp">
         <constraints>
-          <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+          <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
-          <text value="Add"/>
+          <columns value="28"/>
+          <editable value="false"/>
+          <lineWrap value="true"/>
+          <rows value="20"/>
+          <text value="Keyboard Controls:  W/A/S/D - Move Camera  Z/X - Move Camera Up/Down  Right Mouse - Rotate Camera  [ / ] - Rotate Directional Light  1 / 2 - Move Point Light  T - Toggle Collision Test  C - Spawn Car  P - Spawn Plane  R - Reset Scene  Arrow Keys - Control Last Vehicle  + / - - Adjust Vehicle Speed"/>
+          <wrapStyleWord value="true"/>
         </properties>
       </component>
     </children>

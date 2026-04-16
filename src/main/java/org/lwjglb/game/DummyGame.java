@@ -264,7 +264,27 @@ public class DummyGame implements IGameLogic {
 
         }
 
-        // TODO: Implement GUI actions (Add Car, Add Plane, Clear Screen)
+        // Spawns a car when the GUI issues the "Add Car" command
+        if (GameGUI.getCarAddCommand()) {
+            spawnCar();
+        }
+
+        // Spawns a plane when the GUI issues the "Add Plane" command
+        if (GameGUI.getPlaneAddCommand()) {
+            spawnPlane();
+        }
+
+        // Clears the scene and reloads the default environment
+        if (GameGUI.getClearCommand()) {
+            scene.removeAll();
+            loadDefaultScene();
+            lastVehicleAdded = null;
+        }
+
+        // Resets the scene when the GUI issues the Reset command
+        if (GameGUI.getPlaneAddCommand()) {
+            loadDefaultScene();
+        }
     }
 
     /**
